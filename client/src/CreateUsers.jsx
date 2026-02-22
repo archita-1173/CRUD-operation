@@ -10,8 +10,9 @@ const CreateUsers = () => {
 
   const handleSubmit = e => {
     e.preventDefault()
+    const ageNum = age === '' ? undefined : Number(age)
     axios
-      .post('http://localhost:3001/createUser', { name, email, age })
+      .post('http://localhost:3001/createUser', { name, email, age: ageNum })
       .then(result => {
         console.log(result)
         navigate('/')

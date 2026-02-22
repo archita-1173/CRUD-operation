@@ -8,7 +8,9 @@ app.use(cors())
 app.use(express.json())
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/crud'
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err))
 
 app.get('/', (req, res) => {
     UserModel.find({})
@@ -19,7 +21,10 @@ app.get('/', (req, res) => {
 app.get('/getUser/:id', (req, res) => {
     const id = req.params.id
     UserModel.findById(id)
-        .then(user => res.json(user))
+        .then(user => {
+            if (!user) return res.status(404).json({ error: 'User not found' })
+            res.json(user)
+        })
         .catch(err => res.status(500).json({ error: err.message }))
 })
 
@@ -35,9 +40,12 @@ app.put('/updateUser/:id', (req, res) => {
     UserModel.findByIdAndUpdate(
         id,
         { name: req.body.name, email: req.body.email, age: req.body.age },
-        { new: true }
+        { new: true, runValidators: true }
     )
-        .then(user => res.json(user))
+        .then(user => {
+            if (!user) return res.status(404).json({ error: 'User not found' })
+            res.json(user)
+        })
         .catch(err => res.status(500).json({ error: err.message }))
 })
 

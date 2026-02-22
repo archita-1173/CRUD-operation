@@ -14,17 +14,21 @@ const UpdateUsers = () => {
     axios
       .get('http://localhost:3001/getUser/' + id)
       .then(result => {
-        setName(result.data.name)
-        setEmail(result.data.email)
-        setAge(result.data.age)
+        const user = result.data
+        if (user) {
+          setName(user.name ?? '')
+          setEmail(user.email ?? '')
+          setAge(user.age ?? '')
+        }
       })
       .catch(err => console.log(err))
   }, [id])
 
   const handleUpdate = e => {
     e.preventDefault()
+    const ageNum = age === '' ? undefined : Number(age)
     axios
-      .put('http://localhost:3001/updateUser/' + id, { name, email, age })
+      .put('http://localhost:3001/updateUser/' + id, { name, email, age: ageNum })
       .then(result => {
         console.log(result)
         navigate('/')
